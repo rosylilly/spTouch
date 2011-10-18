@@ -4,3 +4,6 @@
 [submodule "tools/uglifyjs"]
 	path = tools/uglifyjs
 	url = http://github.com/mishoo/UglifyJS.git
+[submodule "test/qunit"]
+	path = test/qunit
+	url = http://github.com/jquery/qunit.git
