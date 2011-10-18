@@ -6,8 +6,13 @@
  * @param {Number} speedY y軸の速度
  */
 function FlickEvent (speedX, speedY) {
-  this = document.createEvent('UIEvents');
-  this.initUIEvent('flick', true, true, window, 1);
+  event = document.createEvent('UIEvents');
+  event.initUIEvent('flick', true, true, window, 1);
 
-  return this;
+  event.speedX = speedX;
+  event.speedY = speedY;
+
+  return event;
 };
+
+spTouch.FlickEvent = FlickEvent;

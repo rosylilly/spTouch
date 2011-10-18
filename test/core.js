@@ -47,6 +47,13 @@ test('HTMLElementでもStringでもArrayでもなければException', function()
 
 module('core.static');
 
+test('each', function() {
+    expect(3);
+    spTouch.each([1, 1, 1], function(n) {
+        ok(n === 1);
+      });
+  });
+
 test('isString', function() {
     ok(spTouch.isString(''));
     ok(!spTouch.isString({}));

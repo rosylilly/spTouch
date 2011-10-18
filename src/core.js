@@ -60,7 +60,18 @@ spTouch.fn = spTouch.prototype = /** @lends spTouch.prototype */{
         this.length = elements.length;
       };
     };
+    spTouch.setEventListeners(this);
     return this;
+  },
+
+  /**
+   * すべてのHTMLElementに実行します
+   * @param {Function} func 実行する関数
+   */
+  each: function(func) {
+    for (var i = 0, l = this.length; i < l; i++) {
+      func.apply(this, [this[i], i]);
+    };
   },
 
   /**
@@ -69,10 +80,11 @@ spTouch.fn = spTouch.prototype = /** @lends spTouch.prototype */{
   length: 0
 };
 
-spTouch.ext = spTouch.fn.ext = function(obj) {
+spTouch.ext = spTouch.fn.ext = function(obj, target) {
   var name;
+  target = target || spTouch;
   for(name in obj) {
-    spTouch[name] = obj[name];
+    target[name] = obj[name];
   };
 };
 
@@ -80,6 +92,26 @@ spTouch.ext = spTouch.fn.ext = function(obj) {
 spTouch.ext(
   /** @lends spTouch */
   {
+  /**
+   * 配列に対して順次funcを実行する
+   * @param {Array} obj 対象となる配列
+   * @param {Function} func 実行する関数
+   */
+  each: function(obj, func) {
+    spTouch.fn.each.apply(obj, [func]);
+  },
+
+  /**
+   * @private
+   */
+  setEventListeners: function(object) {
+    spTouch.each(object, function(element) {
+        element.addEventListener('touchstart', Gesture.Listeners.touchstart);
+        element.addEventListener('touchmove', Gesture.Listeners.touchmove);
+        element.addEventListener('touchend', Gesture.Listeners.touchend);
+      });
+  },
+
   /**
    * 文字列かどうかの判別
    * @returns {Boolean}
