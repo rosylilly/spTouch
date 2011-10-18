@@ -1,3 +1,6 @@
 [submodule "tools/jsdoc"]
 	path = tools/jsdoc
 	url = http://github.com/micmath/jsdoc.git
+[submodule "tools/uglifyjs"]
+	path = tools/uglifyjs
+	url = http://github.com/mishoo/UglifyJS.git
