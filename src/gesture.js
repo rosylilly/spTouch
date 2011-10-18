@@ -16,19 +16,22 @@ Gesture.Constants = {
    * @constant
    * @type Number
    */
-  LONGTAP_LENGTH: 800,
+  LONGTAP_LENGTH: 400,
 
   /**
    * フリックとして認識される時間(ms)
    * @constant
    * @type Number
    */
-  FLICK_LENGTH: 100
+  FLICK_LENGTH: 200
 };
 
 Gesture.fn = Gesture.prototype = /** @lends Gesture.prototype */{
   constructor: Gesture,
 
+  /**
+   * @private
+   */
   init: function(owner, touches) {
     this.element = owner;
     this.fingers = touches.length;
@@ -57,6 +60,10 @@ Gesture.fn = Gesture.prototype = /** @lends Gesture.prototype */{
     };
   },
 
+  /**
+   * ジェスチャ入力を記録する
+   * @param {Object} touches TouchEvent.touchesオブジェクト
+   */
   record: function(touches) {
     this.isTap = false;
     this.touchRecorder.push(Gesture.touches2data(touches));
@@ -67,6 +74,9 @@ Gesture.fn = Gesture.prototype = /** @lends Gesture.prototype */{
     };
   },
 
+  /**
+   * ジェスチャ入力を終了
+   */
   end: function() {
     if (this.ended)
       return;
@@ -97,6 +107,10 @@ Gesture.fn = Gesture.prototype = /** @lends Gesture.prototype */{
     };
   },
 
+  /**
+   * element.dispatchEventのラッパ
+   * @param {Event} event 発生させるイベント
+   */
   dispatch: function(event) {
     var _this = this;
     setTimeout(function() {
@@ -104,6 +118,10 @@ Gesture.fn = Gesture.prototype = /** @lends Gesture.prototype */{
     }, 0);
   },
 
+  /**
+   * 移動距離計算
+   * @param {String} type 計算パターン
+   */
   calculationDistance: function(type) {
     var x,y,lastTouch = this.touchRecorder[this.touchRecorder.length - 1];
 
@@ -149,6 +167,7 @@ Gesture.fn = Gesture.prototype = /** @lends Gesture.prototype */{
   endTime: 0,
 
   /**
+   * ジェスチャ入力している指の本数
    * @type Number
    */
   fingers: 0
