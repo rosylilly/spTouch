@@ -1,0 +1,2 @@
+global.spTouch = spTouch;
+}(window);
