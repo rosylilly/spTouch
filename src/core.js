@@ -75,10 +75,28 @@ spTouch.fn = spTouch.prototype = /** @lends spTouch.prototype */{
   },
 
   /**
+   * イベントリスナの設定
+   * @param {Object} listeners イベントリスナのオブジェクト
+   * @example 
+   * spTouch('div').bind({
+   *     flick: function(){ ... },
+   *     tap: function(){ ... }
+   *   });
+   */
+  bind: function(listeners) {
+    this.each(function(element) {
+        for (var event in listeners) {
+          element.addEventListener(event, listeners[event]);
+        };
+      });
+  },
+
+  /**
    * @property {Number} 
    */
   length: 0
 };
+spTouch.fn.init.prototype = spTouch.fn;
 
 spTouch.ext = spTouch.fn.ext = function(obj, target) {
   var name;
@@ -109,6 +127,7 @@ spTouch.ext(
         element.addEventListener('touchstart', Gesture.Listeners.touchstart);
         element.addEventListener('touchmove', Gesture.Listeners.touchmove);
         element.addEventListener('touchend', Gesture.Listeners.touchend);
+        element.addEventListener('touchcancel', Gesture.Listeners.touchend);
       });
   },
 
