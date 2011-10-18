@@ -4,6 +4,11 @@
  * @constructor
  * @param {String|Array<HTMLElement>|HTMLElement} selector spTouchを適用する要素のセレクタ、もしくは要素のオブジェクト及びその配列
  * @param {HTMLElement} [context] selectorのコンテキスト
+ * @example
+ * spTouch(document.getElementById('id')) == spTouch('#id')
+ * spTouch('div > p').bind({
+ *    flick: function(){ ... }
+ *    });
  */
 function spTouch (selector, context) {
   return new spTouch.fn.init(selector, context);
