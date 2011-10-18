@@ -60,6 +60,11 @@ Gesture.fn = Gesture.prototype = /** @lends Gesture.prototype */{
   record: function(touches) {
     this.isTap = false;
     this.touchRecorder.push(Gesture.touches2data(touches));
+
+    if (this.isSwipe) {
+      var gesture = this.calculationDistance('swipe');
+      this.dispatch(new SwipeEvent(gesture.x, gesture.y));
+    };
   },
 
   end: function() {
@@ -72,6 +77,7 @@ Gesture.fn = Gesture.prototype = /** @lends Gesture.prototype */{
     if (this.flickTimer)
       clearTimeout(this.flickTimer);
     this.endTime = (new Date()).getTime();
+    this.element.gesture__ = null;
 
     if (this.isTap) {
       var tap = new TapEvent();
@@ -83,14 +89,12 @@ Gesture.fn = Gesture.prototype = /** @lends Gesture.prototype */{
       return;
     };
 
-    var gesture = this.calculationDistance();
 
     if (this.isFlick) {
+      var gesture = this.calculationDistance('flick');
       this.dispatch(new FlickEvent(gesture.x, gesture.y));
       return;
     };
-
-    this.element.gesture__ = null;
   },
 
   dispatch: function(event) {
@@ -100,15 +104,24 @@ Gesture.fn = Gesture.prototype = /** @lends Gesture.prototype */{
     }, 0);
   },
 
-  calculationDistance: function() {
-    var lastTouch = this.touchRecorder[this.touchRecorder.length - 1];
-    if (this.fingers == 1) {
-      var x = this.baseTouch[0].x - lastTouch[0].x;
-      var y = this.baseTouch[0].y - lastTouch[0].y;
-      return {x: x, y: y};
-    } else if (this.fingers == 2) {
-    } else {
+  calculationDistance: function(type) {
+    var x,y,lastTouch = this.touchRecorder[this.touchRecorder.length - 1];
+
+    switch (type) {
+    case 'flick':
+      x = this.baseTouch[0].x - lastTouch[0].x;
+      y = this.baseTouch[0].y - lastTouch[0].y;
+      break;
+    case 'swipe':
+      var index = this.touchRecorder.length - 2;
+      if (index < 0) { index = 0 };
+      var beforeTouch = this.touchRecorder[index];
+      x = beforeTouch[0].x - lastTouch[0].x;
+      y = beforeTouch[0].y - lastTouch[0].y;
+      break;
     };
+
+    return {x: x, y: y};
   },
 
   /** @type Boolean */ isSwipe: false,
@@ -164,12 +177,14 @@ spTouch.ext(
  */
 Gesture.Listeners = {
   touchstart: function(event) {
+    event.preventDefault();
     var touches = event.touches;
     if (event instanceof MouseEvent) { touches = [event] };
     event.target.gesture__ = new Gesture(event.target, touches);
   },
 
   touchmove: function(event) {
+    event.preventDefault();
     if (event.target.gesture__) {
       var touches = event.touches;
       if (event instanceof MouseEvent) { touches = [event] };
@@ -178,6 +193,7 @@ Gesture.Listeners = {
   },
 
   touchend: function(event) {
+    event.preventDefault();
     if (event.target.gesture__) {
       event.target.gesture__.end();
     };
