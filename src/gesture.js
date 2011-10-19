@@ -53,7 +53,7 @@ Gesture.fn = Gesture.prototype = /** @lends Gesture.prototype */{
       this.isFlick = true;
       var _this = this;
       this.longTapTimer = setTimeout(function(){ if (_this.isTap) { _this.isLongTap = true; _this.end(); }; }, Gesture.Constants.LONGTAP_LENGTH);
-      this.flickTimer = setTimeout(function(){ _this.isFlick = false; }, Gesture.Constants.FLICK_LENGTH);
+      this.flickTimer = setTimeout(function(){ _this.isFlick = false; Gesture.capturing = false; }, Gesture.Constants.FLICK_LENGTH);
     };
     if (this.fingers == 2) {
       this.isPinch = true;
@@ -67,9 +67,10 @@ Gesture.fn = Gesture.prototype = /** @lends Gesture.prototype */{
   record: function(touches) {
     this.isTap = false;
     this.touchRecorder.push(Gesture.touches2data(touches));
-
+    
     if (this.isSwipe) {
       var gesture = this.calculationDistance('swipe');
+
       this.dispatch(new SwipeEvent(gesture.x, gesture.y));
     };
   },
@@ -112,10 +113,7 @@ Gesture.fn = Gesture.prototype = /** @lends Gesture.prototype */{
    * @param {Event} event 発生させるイベント
    */
   dispatch: function(event) {
-    var _this = this;
-    setTimeout(function() {
-      _this.element.dispatchEvent(event);
-    }, 0);
+    this.element.dispatchEvent(event);
   },
 
   /**
@@ -196,16 +194,16 @@ spTouch.ext(
  */
 Gesture.Listeners = {
   touchstart: function(event) {
-    if (!event.target['throwTouchEvents'])
-      event.preventDefault();
+    event.preventDefault();
+    event.stopPropagation();
     var touches = event.touches;
     if (event instanceof MouseEvent) { touches = [event] };
     event.target.gesture__ = new Gesture(event.target, touches);
   },
 
   touchmove: function(event) {
-    if (!event.target['throwTouchEvents'])
-      event.preventDefault();
+    event.preventDefault();
+    event.stopPropagation();
     if (event.target.gesture__) {
       var touches = event.touches;
       if (event instanceof MouseEvent) { touches = [event] };
@@ -214,10 +212,22 @@ Gesture.Listeners = {
   },
 
   touchend: function(event) {
-    if (!event.target['throwTouchEvents'])
-      event.preventDefault();
+    event.preventDefault();
+    event.stopPropagation();
     if (event.target.gesture__) {
       event.target.gesture__.end();
     };
+  },
+
+  documentscroll: function(event) {
+  },
+
+  documenttouchstart: function(event) {
+  },
+
+  documenttouchmove: function(event) {
+  },
+
+  documenttouchend: function(event) {
   }
 };

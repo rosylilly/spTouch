@@ -24,6 +24,7 @@ spTouch.ext(
               var moveX = (event.speedX / spTouch.fn.scroller.step);
               var speedX = event.speedX / 10;
               var minusX = (speedX < 0);
+
               if (spTouch.fn.scroller.timer.x) {
                 clearInterval(spTouch.fn.scroller.timer.x);
               };
@@ -38,6 +39,7 @@ spTouch.ext(
               var moveY = (event.speedY / spTouch.fn.scroller.step);
               var speedY = event.speedY / 10;
               var minusY = (speedY < 0);
+
               if (spTouch.fn.scroller.timer.y) {
                 clearInterval(spTouch.fn.scroller.timer.y);
               };
@@ -55,28 +57,19 @@ spTouch.ext(
     scrollTop: function(n) {
       if (!(n === null || n === undefined)) {
         this.each(function(element) {
-            element.scrollTop = n;
-            if ((element.scrollTop + element.offsetHeight == element.scrollHeight) ||
-              (element.scrollTop == 0)
-            ){
-              element.throwTouchEvents = true;
-            } else {
-              element.throwTouchEvents = false;
-            };
+            element.scrollTop = Math.floor(n);
           });
-      } else {
-        return this[0].scrollTop;
       };
+      return this[0].scrollTop;
     },
 
     scrollLeft: function(n) {
       if (!(n === null || n === undefined)) {
         this.each(function(element) {
-            element.scrollLeft = n;
+            element.scrollLeft = Math.floor(n);
           });
-      } else {
-        return this[0].scrollLeft;
       };
+      return this[0].scrollLeft;
     }
 }, spTouch.fn);
 

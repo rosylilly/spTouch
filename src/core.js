@@ -10,8 +10,8 @@
  *    flick: function(){ ... }
  *    });
  */
-function spTouch (selector, context) {
-  return new spTouch.fn.init(selector, context);
+function spTouch (selector, context, option) {
+  return new spTouch.fn.init(selector, context, option);
 };
 
 
@@ -21,11 +21,16 @@ spTouch.fn = spTouch.prototype = /** @lends spTouch.prototype */{
   /**
    * @private
    */
-  init: function(selector, context) {
+  init: function(selector, context, option) {
+    option = option || {};
+    if (context && !spTouch.isDOMObject(context)) {
+      option = context;
+      context = null;
+    };
     context = context || document;
     this.length = 0;
 
-    if (selector["tagName"]) {
+    if (spTouch.isDOMObject(selector)) {
       this[0] = selector;
       this.length = 1;
     } else {
@@ -65,7 +70,8 @@ spTouch.fn = spTouch.prototype = /** @lends spTouch.prototype */{
         this.length = elements.length;
       };
     };
-    spTouch.setEventListeners(this);
+    if (!option['noListener'])
+      spTouch.setEventListeners(this);
     return this;
   },
 
@@ -154,11 +160,19 @@ spTouch.ext(
    */
   setEventListeners: function(object) {
     spTouch.each(object, function(element) {
-        element.addEventListener('touchstart', Gesture.Listeners.touchstart);
-        element.addEventListener('touchmove', Gesture.Listeners.touchmove);
-        element.addEventListener('touchend', Gesture.Listeners.touchend);
-        element.addEventListener('touchcancel', Gesture.Listeners.touchend);
+        element.addEventListener('touchstart', Gesture.Listeners.touchstart, true);
+        element.addEventListener('touchmove', Gesture.Listeners.touchmove, true);
+        element.addEventListener('touchend', Gesture.Listeners.touchend, true);
+        element.addEventListener('touchcancel', Gesture.Listeners.touchend, true);
       });
+    if (!spTouch.setEventListeners.initialized) {
+      document.addEventListener('scroll', Gesture.Listeners.documentscroll);
+      document.addEventListener('touchstart', Gesture.Listeners.documenttouchstart);
+      document.addEventListener('touchmove', Gesture.Listeners.documenttouchmove);
+      document.addEventListener('touchend', Gesture.Listeners.documenttouchend);
+      document.addEventListener('touchcancel', Gesture.Listeners.documenttouchend);
+      spTouch.setEventListeners.initialized = true;
+    };
   },
 
   /**
@@ -190,3 +204,5 @@ spTouch.ext(
     return (obj && obj.nodeType === 1 && obj.ownerDocument === document)
   }
 });
+
+spTouch.setEventListeners.initialized = false;
