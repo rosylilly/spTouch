@@ -160,10 +160,10 @@ spTouch.ext(
    */
   setEventListeners: function(object) {
     spTouch.each(object, function(element) {
-        element.addEventListener('touchstart', Gesture.Listeners.touchstart, true);
-        element.addEventListener('touchmove', Gesture.Listeners.touchmove, true);
-        element.addEventListener('touchend', Gesture.Listeners.touchend, true);
-        element.addEventListener('touchcancel', Gesture.Listeners.touchend, true);
+        element.addEventListener('touchstart', Gesture.Listeners.touchstart);
+        element.addEventListener('touchmove', Gesture.Listeners.touchmove);
+        element.addEventListener('touchend', Gesture.Listeners.touchend);
+        element.addEventListener('touchcancel', Gesture.Listeners.touchend);
       });
     if (!spTouch.setEventListeners.initialized) {
       document.addEventListener('scroll', Gesture.Listeners.documentscroll);

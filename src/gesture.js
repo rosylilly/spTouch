@@ -7,6 +7,12 @@ function Gesture (owner, touches) {
   return new Gesture.fn.init(owner, touches);
 };
 
+Gesture.timers = {
+  longTap: null
+};
+
+Gesture.capturing = false;
+
 /**
  * @namespace
  */
@@ -16,7 +22,7 @@ Gesture.Constants = {
    * @constant
    * @type Number
    */
-  LONGTAP_LENGTH: 400,
+  LONGTAP_LENGTH: 500,
 
   /**
    * フリックとして認識される時間(ms)
@@ -33,6 +39,13 @@ Gesture.fn = Gesture.prototype = /** @lends Gesture.prototype */{
    * @private
    */
   init: function(event, touches) {
+    if (Gesture.capturing) {
+      setTimeout(function() { event.target.gesture__ = null; }, 50);
+      return this;
+    }
+
+    Gesture.capturing = true;
+
     this.event = event;
     this.element = event.target;
     this.fingers = touches.length;
@@ -51,10 +64,23 @@ Gesture.fn = Gesture.prototype = /** @lends Gesture.prototype */{
     this.isPinch = false;
     if (this.fingers == 1) {
       this.isTap = true;
+      var _this = this;
+
+      if (typeof Gesture.timers.longTap == 'number') {
+        clearTimeout(Gesture.timers.longTap);
+      };
+      Gesture.timers.longTap = setTimeout(function() {
+          if (_this.isTap && !_this.ended) {
+            _this.isLongTap = true;
+            _this.end();
+          };
+        }, Gesture.Constants.LONGTAP_LENGTH);
     };
     if (this.fingers == 2) {
       this.isPinch = true;
     };
+
+    return this;
   },
 
   /**
@@ -83,9 +109,13 @@ Gesture.fn = Gesture.prototype = /** @lends Gesture.prototype */{
     this.endTime = (new Date()).getTime();
     this.element.gesture__ = null;
 
+    if (typeof Gesture.timers.longTap == 'number') {
+      clearTimeout(Gesture.timers.longTap);
+    };
+
     var length = this.endTime - this.startTime;
 
-    if (this.isTap && length > Gesture.Constants.LONGTAP_LENGTH) { this.isLongTap = true };
+    if (length < Gesture.Constants.LONGTAP_LENGTH) { this.isLongTap = false; };
     if (length < Gesture.Constants.FLICK_LENGTH) { this.isFlick = true };
 
     switch (true) {
@@ -100,6 +130,8 @@ Gesture.fn = Gesture.prototype = /** @lends Gesture.prototype */{
       this.dispatch(new FlickEvent(gesture.x, gesture.y));
       break;
     };
+
+    Gesture.capturing = false;
   },
 
   /**
@@ -188,8 +220,10 @@ spTouch.ext(
  */
 Gesture.Listeners = {
   touchstart: function(event) {
-    var touches = event.touches;
-    event.target.gesture__ = new Gesture(event, touches);
+    if (!event.target.gesture__) {
+      var touches = event.touches;
+      event.target.gesture__ = new Gesture(event, touches);
+    };
   },
 
   touchmove: function(event) {
