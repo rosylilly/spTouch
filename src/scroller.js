@@ -56,6 +56,13 @@ spTouch.ext(
       if (!(n === null || n === undefined)) {
         this.each(function(element) {
             element.scrollTop = n;
+            if ((element.scrollTop + element.offsetHeight == element.scrollHeight) ||
+              (element.scrollTop == 0)
+            ){
+              element.throwTouchEvents = true;
+            } else {
+              element.throwTouchEvents = false;
+            };
           });
       } else {
         return this[0].scrollTop;

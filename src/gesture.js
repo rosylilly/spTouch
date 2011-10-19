@@ -196,14 +196,16 @@ spTouch.ext(
  */
 Gesture.Listeners = {
   touchstart: function(event) {
-    event.preventDefault();
+    if (!event.target['throwTouchEvents'])
+      event.preventDefault();
     var touches = event.touches;
     if (event instanceof MouseEvent) { touches = [event] };
     event.target.gesture__ = new Gesture(event.target, touches);
   },
 
   touchmove: function(event) {
-    event.preventDefault();
+    if (!event.target['throwTouchEvents'])
+      event.preventDefault();
     if (event.target.gesture__) {
       var touches = event.touches;
       if (event instanceof MouseEvent) { touches = [event] };
@@ -212,7 +214,8 @@ Gesture.Listeners = {
   },
 
   touchend: function(event) {
-    event.preventDefault();
+    if (!event.target['throwTouchEvents'])
+      event.preventDefault();
     if (event.target.gesture__) {
       event.target.gesture__.end();
     };
