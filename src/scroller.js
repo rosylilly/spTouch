@@ -16,8 +16,24 @@ spTouch.ext(
       var _this = this;
       this.bind({
           'swipe': function(event) {
-            if (x) { _this.scrollLeft(_this.scrollLeft() + event.moveX) };
-            if (y) { _this.scrollTop(_this.scrollTop() + event.moveY) };
+            if (x) { 
+              if (!(
+                (_this.scrollLeft() <= 0 && event.moveX < 0) ||
+                (_this.scrollLeft() >= _this[0].scrollWidth - _this[0].clientWidth && event.moveX > 0)
+              )) {
+                event.parentEvent.preventDefault();
+              };
+              _this.scrollLeft(_this.scrollLeft() + event.moveX);
+            };
+            if (y) {
+              if (!(
+                (_this.scrollTop() <= 0 && event.moveY < 0) ||
+                (_this.scrollTop() >= _this[0].scrollHeight - _this[0].clientHeight && event.moveY > 0)
+              )) {
+                event.parentEvent.preventDefault();
+              };
+              _this.scrollTop(_this.scrollTop() + event.moveY);
+            };
           },
           'flick': function(event) {
             if (x) {

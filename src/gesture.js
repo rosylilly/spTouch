@@ -32,8 +32,9 @@ Gesture.fn = Gesture.prototype = /** @lends Gesture.prototype */{
   /**
    * @private
    */
-  init: function(owner, touches) {
-    this.element = owner;
+  init: function(event, touches) {
+    this.event = event;
+    this.element = event.target;
     this.fingers = touches.length;
 
     this.baseTouch = Gesture.touches2data(touches);
@@ -50,10 +51,6 @@ Gesture.fn = Gesture.prototype = /** @lends Gesture.prototype */{
     this.isPinch = false;
     if (this.fingers == 1) {
       this.isTap = true;
-      this.isFlick = true;
-      var _this = this;
-      this.longTapTimer = setTimeout(function(){ if (_this.isTap) { _this.isLongTap = true; _this.end(); }; }, Gesture.Constants.LONGTAP_LENGTH);
-      this.flickTimer = setTimeout(function(){ _this.isFlick = false; Gesture.capturing = false; }, Gesture.Constants.FLICK_LENGTH);
     };
     if (this.fingers == 2) {
       this.isPinch = true;
@@ -62,16 +59,16 @@ Gesture.fn = Gesture.prototype = /** @lends Gesture.prototype */{
 
   /**
    * ジェスチャ入力を記録する
-   * @param {Object} touches TouchEvent.touchesオブジェクト
+   * @param {Event} event TouchEventオブジェクト
    */
-  record: function(touches) {
+  record: function(event) {
     this.isTap = false;
-    this.touchRecorder.push(Gesture.touches2data(touches));
+    this.touchRecorder.push(Gesture.touches2data(event.touches));
     
     if (this.isSwipe) {
       var gesture = this.calculationDistance('swipe');
 
-      this.dispatch(new SwipeEvent(gesture.x, gesture.y));
+      this.dispatch(new SwipeEvent(gesture.x, gesture.y, event));
     };
   },
 
@@ -83,28 +80,25 @@ Gesture.fn = Gesture.prototype = /** @lends Gesture.prototype */{
       return;
 
     this.ended = true;
-    if (this.longTapTimer)
-      clearTimeout(this.longTapTimer);
-    if (this.flickTimer)
-      clearTimeout(this.flickTimer);
     this.endTime = (new Date()).getTime();
     this.element.gesture__ = null;
 
-    if (this.isTap) {
-      var tap = new TapEvent();
-      if (this.isLongTap) {
-        tap = new LongTapEvent();
-      };
+    var length = this.endTime - this.startTime;
 
-      this.dispatch(tap);
-      return;
-    };
+    if (this.isTap && length > Gesture.Constants.LONGTAP_LENGTH) { this.isLongTap = true };
+    if (length < Gesture.Constants.FLICK_LENGTH) { this.isFlick = true };
 
-
-    if (this.isFlick) {
+    switch (true) {
+    case this.isLongTap:
+      this.dispatch(new LongTapEvent());
+      break;
+    case this.isTap:
+      this.dispatch(new TapEvent());
+      break;
+    case this.isFlick:
       var gesture = this.calculationDistance('flick');
       this.dispatch(new FlickEvent(gesture.x, gesture.y));
-      return;
+      break;
     };
   },
 
@@ -194,26 +188,17 @@ spTouch.ext(
  */
 Gesture.Listeners = {
   touchstart: function(event) {
-    event.preventDefault();
-    event.stopPropagation();
     var touches = event.touches;
-    if (event instanceof MouseEvent) { touches = [event] };
-    event.target.gesture__ = new Gesture(event.target, touches);
+    event.target.gesture__ = new Gesture(event, touches);
   },
 
   touchmove: function(event) {
-    event.preventDefault();
-    event.stopPropagation();
     if (event.target.gesture__) {
-      var touches = event.touches;
-      if (event instanceof MouseEvent) { touches = [event] };
-      event.target.gesture__.record(touches);
+      event.target.gesture__.record(event);
     };
   },
 
   touchend: function(event) {
-    event.preventDefault();
-    event.stopPropagation();
     if (event.target.gesture__) {
       event.target.gesture__.end();
     };
