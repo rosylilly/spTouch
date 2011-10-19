@@ -97,6 +97,31 @@ spTouch.fn = spTouch.prototype = /** @lends spTouch.prototype */{
   },
 
   /**
+   * CSSの値を取得、設定する
+   * @param {String} property CSSプロパティ名
+   * @param {String} [value] 設定する値
+   */
+  css: function(property, value) {
+    if (!value) {
+      if (this.length == 1) {
+        var st = document.defaultView.getComputedStyle(this[0], ''); 
+        return st.getPropertyValue(property);
+      } else {
+        var values = [];
+        this.each(function(e) {
+            var st = document.defaultView.getComputedStyle(e, '');
+            values.push(st.getPropertyValue(property));
+          });
+        return values;
+      };
+    } else {
+      this.each(function(e) {
+          e.style[property] = value;
+        });
+    };
+  },
+
+  /**
    * @property {Number} 
    */
   length: 0

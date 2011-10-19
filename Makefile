@@ -8,7 +8,7 @@ DOC_DIR = doc
 PREFIX = .
 DIST_DIR = ${PREFIX}/dist
 
-BASE_FILES = core gesture tapEvent longTapEvent flickEvent swipeEvent
+BASE_FILES = core gesture scroller tapEvent longTapEvent flickEvent swipeEvent
 
 SRC_FILES = intro ${BASE_FILES} outro
 DOC_FILES = ${addprefix ${SRC_DIR}/,${addsuffix .js,${BASE_FILES}}} 
@@ -82,10 +82,7 @@ update_submodules:
 			git submodule update --init --recursive --merge; \
 		fi; \
 	fi;
-	@@if [ -d ${TOOL_JSDOC_BASE} ]; then \
-		cd ${TOOL_JSDOC_BASE}; \
-		svn up; \
-	else \
+	@@if [ ! -d ${TOOL_JSDOC_BASE} ]; then \
 		svn co http://jsdoc-toolkit.googlecode.com/svn/trunk/jsdoc-toolkit ${TOOL_JSDOC_BASE}; \
 	fi;
 
