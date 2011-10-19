@@ -5,6 +5,7 @@ spTouch.ext(
    */
   {
     /**
+     * flickやswipeで要素内スクロールができるようにします。
      * @param {Boolean} [x=true] x方向にスクロールできるかどうか
      * @param {Boolean} [y=true] y方向にスクロールできるかどうか
      */
