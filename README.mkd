@@ -4,7 +4,6 @@
 
 ## Quick Usage
 
-    ```javascript
     spTouch('#id');
 
 とすると、以降`#id`の要素に、以下のようなイベントが飛んでくるようになります。
@@ -18,10 +17,13 @@
 
 ## Scroller
 
-    ```javascript
     spTouch('#id').scroller();
 
 とすることで、`#id`の要素の中身が指でスクロールできるようになります。それらしく、一番上までスクロールした時や一番下までスクロールしたときなどは、親にスクロールが透過されます。フリックでびゅんびゅん読むことも可能です。
 
+## ご利用
 
-あとで追記
+    $ git clone git://github.com/hebisan/spTouch.git spTouch
+    $ make all
+
+ドキュメントらしいものは`doc`フォルダに。
