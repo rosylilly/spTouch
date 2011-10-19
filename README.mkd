@@ -1,1 +1,27 @@
 # spTouch
+
+スマートフォン向け拡張JS。prue JSなので、とくに何とも干渉しません。
+
+## Quick Usage
+
+    ```javascript
+    spTouch('#id');
+
+とすると、以降`#id`の要素に、以下のようなイベントが飛んでくるようになります。
+
+- FlickEvent
+- SwipeEvent
+- TapEvent
+- LongTapEvent
+
+各イベントの値はどっかで。
+
+## Scroller
+
+    ```javascript
+    spTouch('#id').scroller();
+
+とすることで、`#id`の要素の中身が指でスクロールできるようになります。それらしく、一番上までスクロールした時や一番下までスクロールしたときなどは、親にスクロールが透過されます。フリックでびゅんびゅん読むことも可能です。
+
+
+あとで追記
